@@ -1,5 +1,6 @@
 scikit-learn==1.3.0
 pandas==2.2.2
 numpy==1.26.4
-dvc==3.32.0
+# unpinned: 3.32.0 conflicted with newer pathspec/scmrepo already in the env (dvc init crashed)
+dvc
 mlflow
