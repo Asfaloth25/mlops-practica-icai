@@ -4,3 +4,5 @@ numpy==1.26.4
 # unpinned: 3.32.0 conflicted with newer pathspec/scmrepo already in the env (dvc init crashed)
 dvc
 mlflow
+matplotlib
+seaborn

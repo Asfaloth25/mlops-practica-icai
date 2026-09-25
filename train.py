@@ -9,7 +9,7 @@ import mlflow
 import mlflow.sklearn
 import matplotlib.pyplot as plt
 import seaborn as sns
- 
+
 # Cargar el conjunto de datos desde el archivo CSV
 try:
     iris = pd.read_csv('data/iris_dataset.csv')
@@ -19,6 +19,9 @@ except FileNotFoundError:
 # Dividir el DataFrame en características (X) y etiquetas (y)
 X = iris.drop('target', axis=1)
 y = iris['target']
+
+tracking_uri = os.environ.get("MLFLOW_TRACKING_URI")
+mlflow.set_tracking_uri(tracking_uri)
 
 # Iniciar un experimento de MLflow 
 with mlflow.start_run(): 
@@ -39,7 +42,9 @@ with mlflow.start_run():
     joblib.dump(model, 'model.pkl') 
  
     # Registrar el modelo con MLflow 
-    mlflow.sklearn.log_model(model, "random-forest-model") 
+    mlflow.sklearn.log_model(
+        model, "random-forest-model", skops_trusted_types=["sklearn.tree._tree.Tree"]
+    )
  
     # Registrar parámetros y métricas 
     mlflow.log_param("n_estimators", 100) 
@@ -47,3 +52,15 @@ with mlflow.start_run():
  
     print(f"Modelo entrenado y precisión: {accuracy:.4f}") 
     print("Experimento registrado con MLflow.") 
+
+    # --- Sección de Reporte para CML ---
+    # 1. Generar la matriz de confusión
+    cm = confusion_matrix(y_test, y_pred)
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
+    plt.title('Matriz de Confusión')
+    plt.xlabel('Predicciones')
+    plt.ylabel('Valores Reales')
+    plt.savefig('confusion_matrix.png')
+    print("Matriz de confusión guardada como 'confusion_matrix.png'")
+    # --- Fin de la sección de Reporte ---
